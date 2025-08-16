@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "3OyRIHRzzVQ=",
+  "success": true,
+  "projectFilePath": "E:\\Projects\\Full Stack\\workflow & document management system\\WDMS\\WDMS.Api\\WDMS.Api.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\BSS\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.7\\microsoft.aspnetcore.openapi.9.0.7.nupkg.sha512",
+    "C:\\Users\\BSS\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512"
+  ],
+  "logs": []
+}

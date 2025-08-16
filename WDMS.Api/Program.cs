@@ -1,4 +1,8 @@
 
+using Microsoft.EntityFrameworkCore;
+using WDMS.Infrastructure;
+using WDMS.Infrastructure.Extensions;
+
 namespace WDMS.Api
 {
     public class Program
@@ -7,24 +11,36 @@ namespace WDMS.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            builder.Services.AddDbContext<WdmsDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("WDMS")));
 
             builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
+
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            // Seed the database if needed
+            using (var scope = app.Services.CreateScope())
             {
-                app.MapOpenApi();
+                var context = scope.ServiceProvider.GetRequiredService<WdmsDbContext>();
+
+                // Apply any pending migrations
+                context.Database.Migrate();
+
+                // Seed the database with data
+                DbSeeder.Seed(context);
             }
 
-            app.UseHttpsRedirection();
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
 
-            app.UseAuthorization();
-
+            app.UseHttpsRedirection();  
+            app.UseAuthorization();     
 
             app.MapControllers();
 

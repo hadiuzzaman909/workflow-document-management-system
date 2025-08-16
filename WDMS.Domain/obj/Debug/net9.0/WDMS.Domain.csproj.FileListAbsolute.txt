@@ -1,0 +1,12 @@
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Domain\bin\Debug\net9.0\WDMS.Domain.deps.json
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Domain\bin\Debug\net9.0\WDMS.Domain.dll
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Domain\bin\Debug\net9.0\WDMS.Domain.pdb
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Domain\obj\Debug\net9.0\WDMS.Domain.GeneratedMSBuildEditorConfig.editorconfig
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Domain\obj\Debug\net9.0\WDMS.Domain.AssemblyInfoInputs.cache
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Domain\obj\Debug\net9.0\WDMS.Domain.AssemblyInfo.cs
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Domain\obj\Debug\net9.0\WDMS.Domain.csproj.CoreCompileInputs.cache
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Domain\obj\Debug\net9.0\WDMS.Domain.sourcelink.json
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Domain\obj\Debug\net9.0\WDMS.Domain.dll
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Domain\obj\Debug\net9.0\refint\WDMS.Domain.dll
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Domain\obj\Debug\net9.0\WDMS.Domain.pdb
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Domain\obj\Debug\net9.0\ref\WDMS.Domain.dll

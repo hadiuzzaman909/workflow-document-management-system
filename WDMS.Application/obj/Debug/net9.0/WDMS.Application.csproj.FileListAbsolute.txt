@@ -1,0 +1,16 @@
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\bin\Debug\net9.0\WDMS.Application.deps.json
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\bin\Debug\net9.0\WDMS.Application.dll
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\bin\Debug\net9.0\WDMS.Application.pdb
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\bin\Debug\net9.0\WDMS.Domain.dll
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\bin\Debug\net9.0\WDMS.Domain.pdb
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\obj\Debug\net9.0\WDMS.Application.csproj.AssemblyReference.cache
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\obj\Debug\net9.0\WDMS.Application.GeneratedMSBuildEditorConfig.editorconfig
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\obj\Debug\net9.0\WDMS.Application.AssemblyInfoInputs.cache
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\obj\Debug\net9.0\WDMS.Application.AssemblyInfo.cs
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\obj\Debug\net9.0\WDMS.Application.csproj.CoreCompileInputs.cache
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\obj\Debug\net9.0\WDMS.Application.sourcelink.json
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\obj\Debug\net9.0\WDMS.App.225BBF5C.Up2Date
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\obj\Debug\net9.0\WDMS.Application.dll
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\obj\Debug\net9.0\refint\WDMS.Application.dll
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\obj\Debug\net9.0\WDMS.Application.pdb
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\obj\Debug\net9.0\ref\WDMS.Application.dll

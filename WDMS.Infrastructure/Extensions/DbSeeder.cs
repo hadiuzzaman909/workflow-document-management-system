@@ -1,62 +1,50 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
-using WDMS.Domain.Entities;
-using WDMS.Domain.Enums;
+﻿using WDMS.Domain.Enums;
+using System.Security.Cryptography;
+using System.Text;
+using WDMS.Infrastructure.Data;
 
 namespace WDMS.Infrastructure.Extensions
 {
     public static class DbSeeder
     {
-        public static void Seed(WdmsDbContext context)
+        public static void Seed(ApplicationDbContext context)
         {
-            // Seed Admin table only if it doesn't already contain data
-            if (!context.Admins.Any())
+            if (!context.Admins.Any(a => !a.IsDeleted))
             {
-                context.Admins.Add(new Admin
+                var readWriteAdmin = new Admin
                 {
-                    // Do not set AdminId, let SQL Server handle it
                     Email = "admin@wdms.com",
-                    PasswordHash = new byte[0], // Replace with actual hash
-                    PasswordSalt = new byte[0], // Replace with actual salt
+                    PasswordHash = HashPassword("Admin@123"),
                     AccessLevel = AccessLevel.ReadWrite,
-                    IsActive = true
-                });
-                context.SaveChanges();  // Save Admin
-            }
-
-            // Seed Workflow table only if it doesn't already contain data
-            if (!context.Workflows.Any())
-            {
-                context.Workflows.Add(new Workflow
-                {
-                    Name = "Sample Workflow",
-                    Type = WorkflowType.Order,
-                    CreatedByAdminId = 1,  // Linking to the seeded Admin
-                    CreatedAtUtc = DateTime.UtcNow
-                });
-                context.SaveChanges();  // Save Workflow
-            }
-
-            // Seed Document table
-            if (!context.Documents.Any())
-            {
-                var document = new Document
-                {
-
-                    DocumentUid = Guid.NewGuid(),
-                    Name = "Sample Document",
-                    DocumentTypeId = 1,  // Assume this document type exists
-                    FilePath = "path/to/document",
-                    WorkflowId = 1,  // Linking to seeded Workflow
-                    Status = DocumentStatus.Approved,
-                    CreatedByAdminId = 1,  // Linking to seeded Admin
-                    CreatedAtUtc = DateTime.UtcNow
+                    IsActive = true,
+                    IsDeleted = false,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
                 };
-                context.Documents.Add(document);
-                context.SaveChanges();  // Save document after workflows are seeded
-            }
 
+
+                var readOnlyAdmin = new Admin
+                {
+                    Email = "viewer@wdms.com",
+                    PasswordHash = HashPassword("Viewer@123"),
+                    AccessLevel = AccessLevel.ReadOnly,
+                    IsActive = true,
+                    IsDeleted = false,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                context.Admins.AddRange(readWriteAdmin, readOnlyAdmin);
+                context.SaveChanges();
+
+            }
+        }
+
+        private static string HashPassword(string password)
+        {
+            using var sha256 = SHA256.Create();
+            var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+            return Convert.ToBase64String(hashedBytes);
         }
     }
 }

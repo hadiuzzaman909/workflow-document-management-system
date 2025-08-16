@@ -2,7 +2,9 @@ E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Applicati
 E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\bin\Debug\net9.0\WDMS.Application.dll
 E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\bin\Debug\net9.0\WDMS.Application.pdb
 E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\bin\Debug\net9.0\WDMS.Domain.dll
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\bin\Debug\net9.0\WDMS.Infrastructure.dll
 E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\bin\Debug\net9.0\WDMS.Domain.pdb
+E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\bin\Debug\net9.0\WDMS.Infrastructure.pdb
 E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\obj\Debug\net9.0\WDMS.Application.csproj.AssemblyReference.cache
 E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\obj\Debug\net9.0\WDMS.Application.GeneratedMSBuildEditorConfig.editorconfig
 E:\Projects\Full Stack\workflow & document management system\WDMS\WDMS.Application\obj\Debug\net9.0\WDMS.Application.AssemblyInfoInputs.cache

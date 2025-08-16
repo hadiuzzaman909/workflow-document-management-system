@@ -8,6 +8,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WDMS.Domain\WDMS.Domain.csproj" />
+    <ProjectReference Include="..\WDMS.Infrastructure\WDMS.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="15.0.1" />
   </ItemGroup>
 
 </Project>

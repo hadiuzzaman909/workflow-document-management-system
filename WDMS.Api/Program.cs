@@ -1,7 +1,16 @@
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using WDMS.Infrastructure;
+using WDMS.Api.Extensions;
+using WDMS.Application.Mappings;
+using WDMS.Application.Services;
+using WDMS.Application.Services.IServices;
+using WDMS.Domain.Enums;
+using WDMS.Infrastructure.Data;
 using WDMS.Infrastructure.Extensions;
+using WDMS.Infrastructure.Repositories;
+using WDMS.Infrastructure.Repositories.IRepositories;
+using WDMS.Infrastructure.Services;
+using WDMS.Infrastructure.Utils;
 
 namespace WDMS.Api
 {
@@ -10,40 +19,82 @@ namespace WDMS.Api
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            var config = builder.Configuration;
+            builder.Services.AddCorsPolicies(builder.Configuration);
 
-            builder.Services.AddDbContext<WdmsDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("WDMS")));
+            // Register DbContext
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("WDMS"))
+            );
 
+            builder.Services.AddHttpContextAccessor();  
+
+            // Register Authentication, CORS, and Utilities
+            builder.Services.ConfigureJwtAuth(builder.Configuration);
+            builder.Services.AddCorsPolicies(builder.Configuration);
+            builder.Services.AddSingleton<JwtUtils>();
+
+            // Add AutoMapper
+            builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
+
+            //Repositories
+            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+
+            // Register services
+            builder.Services.AddSingleton<JwtUtils>();
+            builder.Services.AddTransient<IAdminPermissionService, AdminPermissionService>();
+
+            builder.Services.AddScoped<IAdminService, AdminService>();
+            builder.Services.AddTransient<IDocumentTypeService, DocumentTypeService>();
+            builder.Services.AddTransient<IWorkflowService, WorkflowService>();
+            builder.Services.AddScoped<IAuthorizationHandler, PermissionHandler>();
+
+
+            // Add Authorization Policies (Role-Based Access Control)
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+
+                // Permission-based policies
+                options.AddPolicy("Permission.ReadOnly", policy =>
+                    policy.Requirements.Add(new PermissionRequirement(AccessLevel.ReadOnly)));
+
+                options.AddPolicy("Permission.ReadWrite", policy =>
+                    policy.Requirements.Add(new PermissionRequirement(AccessLevel.ReadWrite)));
+            });
+
+
+            // Add Controllers
             builder.Services.AddControllers();
 
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            // Use Swagger Extension
+            builder.Services.ConfigureSwagger();
 
             var app = builder.Build();
 
-            // Seed the database if needed
+
+            // Data seeding
             using (var scope = app.Services.CreateScope())
             {
-                var context = scope.ServiceProvider.GetRequiredService<WdmsDbContext>();
-
-                // Apply any pending migrations
+                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 context.Database.Migrate();
 
-                // Seed the database with data
                 DbSeeder.Seed(context);
             }
 
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+            // Middleware Pipeline
+            // use (place before authentication/authorization and after UseHttpsRedirection ideally)
+            app.UseCorsPolicies(builder.Configuration);
+            app.UseHttpsRedirection();
 
-            app.UseHttpsRedirection();  
-            app.UseAuthorization();     
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            // Conditionally Use Swagger Middleware based on Environment
+            app.UseSwaggerMiddleware(app.Environment);
 
             app.MapControllers();
-
             app.Run();
         }
     }

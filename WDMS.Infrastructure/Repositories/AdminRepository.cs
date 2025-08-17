@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
-using WDMS.Domain.Entities;
 using WDMS.Infrastructure.Data;
 
 namespace WDMS.Infrastructure.Repositories

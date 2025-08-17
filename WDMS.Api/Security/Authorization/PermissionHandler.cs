@@ -23,7 +23,6 @@ public class PermissionHandler : AuthorizationHandler<PermissionRequirement>
             return;
         }
 
-        // Check if the user has the required access level
         bool hasPermission = await _adminPermissionService.AdminHasPermissionAsync(userId, requirement.RequiredAccessLevel);
 
         if (hasPermission)

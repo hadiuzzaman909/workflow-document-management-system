@@ -17,9 +17,8 @@ namespace WDMS.Domain.Entities
             public DateTime? ActionAtUtc { get; set; }
             public string? Comments { get; set; }
 
-
-        public DocumentReviewCycle DocumentReviewCycle { get; set; } 
-        public Admin Admin { get; set; }  
+            public DocumentReviewCycle DocumentReviewCycle { get; set; } 
+            public Admin Admin { get; set; }  
     }
     
 }

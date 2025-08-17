@@ -17,7 +17,6 @@ namespace WDMS.Api.Extensions
                     Description = "WDMS"
                 });
 
-                // Add JWT Authentication to Swagger UI
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Description = "Enter 'Bearer {your_token}' below:",

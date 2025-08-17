@@ -41,7 +41,6 @@ namespace WDMS.Api.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = "Permission.ReadOnly")]
         public async Task<ActionResult<List<AdminResponse>>> GetAdmins()
         {
             try
@@ -62,7 +61,6 @@ namespace WDMS.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Policy = "Permission.ReadWrite")]
         public async Task<ActionResult<AdminResponse>> GetAdminById(int id)
         {
             try

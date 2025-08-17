@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace WDMS.Infrastructure.Repositories.IRepositories
+﻿namespace WDMS.Infrastructure.Repositories.IRepositories
 {
     public interface IGenericRepository<T> where T : class
     {

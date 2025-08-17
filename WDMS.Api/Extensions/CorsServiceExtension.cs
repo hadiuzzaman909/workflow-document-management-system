@@ -22,16 +22,16 @@ namespace WDMS.Api.Extensions
                         policy.WithOrigins(allowedOrigins)
                               .AllowAnyHeader()
                               .AllowAnyMethod()
-                              // NOTE: AllowCredentials CANNOT be combined with AllowAnyOrigin
+            
                               .AllowCredentials();
                     }
                     else
                     {
-                        // Fallback to permissive if not configured
+
                         policy.AllowAnyOrigin()
                               .AllowAnyHeader()
                               .AllowAnyMethod();
-                        // Do NOT call AllowCredentials() with AllowAnyOrigin()
+
                     }
                 });
 

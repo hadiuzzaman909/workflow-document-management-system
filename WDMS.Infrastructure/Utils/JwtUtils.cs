@@ -37,8 +37,8 @@ namespace WDMS.Infrastructure.Utils
             var claims = new[]
             {
         new Claim(ClaimTypes.Name, email),
-        new Claim(ClaimTypes.Role, "Admin"), // Always Admin for the role
-        new Claim("AccessLevel", accessLevel), // ReadOnly or ReadWrite
+        new Claim(ClaimTypes.Role, "Admin"), 
+        new Claim("AccessLevel", accessLevel), 
         new Claim("AdminId", adminId.ToString()),
         new Claim(JwtRegisteredClaimNames.Sub, email),
         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),

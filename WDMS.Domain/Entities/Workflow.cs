@@ -24,4 +24,6 @@ public class Workflow
     public bool IsDeleted { get; set; } = false;
 
     public List<WorkflowAdmin> WorkflowAdmins { get; set; } = new List<WorkflowAdmin>();
+    public List<Document> Documents { get; set; } = new();
+
 }

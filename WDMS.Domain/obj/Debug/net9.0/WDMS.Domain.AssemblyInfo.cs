@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WDMS.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3e65c2c4f29dfc6f2dab174c0efbee64296b7af5")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6b652bfcf2fda0e0e83c419dc4cd284ffd52d516")]
 [assembly: System.Reflection.AssemblyProductAttribute("WDMS.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WDMS.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,9 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using WDMS.Infrastructure.Repositories.IRepositories;
 using WDMS.Infrastructure.Data;
+using WDMS.Infrastructure.Repositories.IRepositories;
 
 namespace WDMS.Infrastructure.Repositories
 {

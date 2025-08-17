@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using WDMS.Application.Services.IServices;
 
 namespace WDMS.Api.Controllers
@@ -16,7 +15,6 @@ namespace WDMS.Api.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<List<Workflow>>> GetWorkflows()
         {
             var workflows = await _workflowService.GetAllWorkflowsAsync();
@@ -24,7 +22,6 @@ namespace WDMS.Api.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "Permission.ReadWrite")]
         public async Task<ActionResult> CreateWorkflow([FromBody] Workflow workflow)
         {
             if (workflow == null)
@@ -37,7 +34,6 @@ namespace WDMS.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Policy = "Permission.ReadOnly")]
         public async Task<ActionResult> UpdateWorkflow(int id, [FromBody] Workflow workflow)
         {
             if (id != workflow.WorkflowId)
@@ -50,7 +46,6 @@ namespace WDMS.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Policy = "Permission.ReadWrite")]
         public async Task<ActionResult> DeleteWorkflow(int id)
         {
             await _workflowService.DeleteWorkflowAsync(id);

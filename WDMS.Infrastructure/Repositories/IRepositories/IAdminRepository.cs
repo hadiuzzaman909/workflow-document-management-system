@@ -1,6 +1,4 @@
-﻿using WDMS.Domain.Entities;
-using WDMS.Infrastructure.Repositories.IRepositories;
-using System.Threading.Tasks;
+﻿using WDMS.Infrastructure.Repositories.IRepositories;
 
 namespace WDMS.Infrastructure.Repositories
 {

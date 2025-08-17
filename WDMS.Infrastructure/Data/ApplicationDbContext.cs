@@ -12,11 +12,15 @@ namespace WDMS.Infrastructure.Data
         public DbSet<DocumentType> DocumentTypes { get; set; }
         public DbSet<Workflow> Workflows { get; set; }
         public DbSet<WorkflowAdmin> WorkflowAdmins { get; set; }
+
+        public DbSet<Document> Documents { get; set; } = null!;
+        public DbSet<TaskAssignment> TaskAssignments { get; set; } = null!;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configure Admin entity
+  
             modelBuilder.Entity<Admin>(entity =>
             {
                 entity.HasKey(e => e.AdminId);
@@ -48,19 +52,17 @@ namespace WDMS.Infrastructure.Data
                     .IsRequired()
                     .HasDefaultValue(false);
 
-                // Create unique index on email for non-deleted records
                 entity.HasIndex(e => e.Email)
                     .IsUnique()
                     .HasFilter("[IsDeleted] = 0");
 
-                // Add indexes for performance
+
                 entity.HasIndex(e => e.IsDeleted);
                 entity.HasIndex(e => e.IsActive);
                 entity.HasIndex(e => new { e.Email, e.IsDeleted, e.IsActive });
             });
 
 
-            // Configure DocumentType entity
             modelBuilder.Entity<DocumentType>(entity =>
             {
                 entity.HasKey(e => e.DocumentTypeId);
@@ -85,13 +87,12 @@ namespace WDMS.Infrastructure.Data
                     .IsRequired()
                     .HasDefaultValue(false);
 
-                // Create unique index on name for non-deleted records
                 entity.HasIndex(e => e.Name)
                     .IsUnique()
                     .HasFilter("[IsDeleted] = 0");
             });
 
-            // Configure Admin entity
+
             modelBuilder.Entity<Admin>(entity =>
             {
                 entity.HasKey(e => e.AdminId);
@@ -123,13 +124,11 @@ namespace WDMS.Infrastructure.Data
                     .IsRequired()
                     .HasDefaultValue(false);
 
-                // Create unique index on email for non-deleted records
                 entity.HasIndex(e => e.Email)
                     .IsUnique()
                     .HasFilter("[IsDeleted] = 0");
             });
 
-            // Configure Workflow entity
             modelBuilder.Entity<Workflow>(entity =>
             {
                 entity.HasKey(e => e.WorkflowId);
@@ -150,14 +149,12 @@ namespace WDMS.Infrastructure.Data
                     .IsRequired()
                     .HasDefaultValue(false);
 
-                // Add foreign key for CreatedByAdminId
-                entity.HasOne(e => e.CreatedByAdmin)  // Navigating to Admin entity
-                    .WithMany()  // One admin can create multiple workflows
+                entity.HasOne(e => e.CreatedByAdmin)  
+                    .WithMany() 
                     .HasForeignKey(e => e.CreatedByAdminId)
-                    .OnDelete(DeleteBehavior.Restrict); // Don't allow cascading delete
+                    .OnDelete(DeleteBehavior.Restrict); 
             });
 
-            // Configure WorkflowAdmin entity (many-to-many relationship between Workflow and Admin)
             modelBuilder.Entity<WorkflowAdmin>()
                 .HasKey(e => new { e.WorkflowId, e.AdminId });
 
@@ -170,6 +167,49 @@ namespace WDMS.Infrastructure.Data
                 .HasOne(e => e.Admin)
                 .WithMany(a => a.WorkflowAdmins)
                 .HasForeignKey(e => e.AdminId);
+
+            // Document
+            modelBuilder.Entity<Document>(entity =>
+            {
+                entity.HasKey(d => d.DocumentId);
+
+                entity.HasIndex(d => d.DocumentUid).IsUnique();
+
+                entity.Property(d => d.Name).IsRequired().HasMaxLength(255);
+                entity.Property(d => d.FilePath).IsRequired().HasMaxLength(1024);
+                entity.Property(d => d.OriginalFileName).HasMaxLength(255);
+                entity.Property(d => d.ContentType).HasMaxLength(127);
+
+                entity.Property(d => d.CreatedAt)
+                      .IsRequired()
+                      .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.Property(d => d.IsDeleted)
+                      .IsRequired()
+                      .HasDefaultValue(false);
+
+                entity.HasOne(d => d.DocumentType)
+                      .WithMany(dt => dt.Documents)             
+                      .HasForeignKey(d => d.DocumentTypeId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(d => d.Workflow)
+                      .WithMany(w => w.Documents)               
+                      .HasForeignKey(d => d.WorkflowId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(d => d.CreatedByAdmin)
+                      .WithMany()                               
+                      .HasForeignKey(d => d.CreatedByAdminId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+
+
         }
+
+
+
+
     }
 }

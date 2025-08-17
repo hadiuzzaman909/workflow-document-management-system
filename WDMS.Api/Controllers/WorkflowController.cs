@@ -51,5 +51,37 @@ namespace WDMS.Api.Controllers
             await _workflowService.DeleteWorkflowAsync(id);
             return NoContent();
         }
+
+        // Approve Task Endpoint
+        [HttpPost("approve-task/{taskAssignmentId}")]
+        public async Task<ActionResult> ApproveTask(int taskAssignmentId)
+        {
+            try
+            {
+                // Call service to approve the task
+                await _workflowService.ApproveTaskAsync(taskAssignmentId);
+                return Ok(new { message = "Task approved successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while approving the task.", error = ex.Message });
+            }
+        }
+
+        // Reject Task Endpoint
+        [HttpPost("reject-task/{taskAssignmentId}")]
+        public async Task<ActionResult> RejectTask(int taskAssignmentId)
+        {
+            try
+            {
+                // Call service to reject the task
+                await _workflowService.RejectTaskAsync(taskAssignmentId);
+                return Ok(new { message = "Task rejected successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while rejecting the task.", error = ex.Message });
+            }
+        }
     }
 }

@@ -12,6 +12,8 @@ namespace WDMS.Application.Services.IServices
         Task<Workflow> GetWorkflowByIdAsync(int id);
         Task CreateWorkflowAsync(Workflow workflow);
         Task UpdateWorkflowAsync(Workflow workflow);
+        Task RejectTaskAsync(int taskAssignmentId);
+        Task ApproveTaskAsync(int taskAssignmentId);
         Task DeleteWorkflowAsync(int id);
     }
 }

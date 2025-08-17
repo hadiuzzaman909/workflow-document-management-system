@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WDMS.Admin")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6b652bfcf2fda0e0e83c419dc4cd284ffd52d516")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+46f368b9cba561309d1d6633b207d0cb61a4e617")]
 [assembly: System.Reflection.AssemblyProductAttribute("WDMS.Admin")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WDMS.Admin")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

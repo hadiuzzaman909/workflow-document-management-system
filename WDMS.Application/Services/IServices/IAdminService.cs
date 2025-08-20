@@ -1,6 +1,7 @@
 ﻿using WDMS.Application.DTOs;
+using WDMS.Domain.Entities;
 
-namespace WDMS.Infrastructure.Services
+namespace WDMS.Applocation.Services
 {
     public interface IAdminService
     {
@@ -11,6 +12,8 @@ namespace WDMS.Infrastructure.Services
         Task<bool> DeleteAdminAsync(int id);
         Task<string?> GenerateJwtTokenAsync(string email, string password);
         Task<AdminResponse?> GetAdminByEmailAsync(string email);
+
+        Task<Admin> GetAdminByEmail(string email);
         Task<bool> ValidateAdminCredentialsAsync(string email, string password);
     }
 }

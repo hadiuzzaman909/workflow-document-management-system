@@ -1,31 +1,198 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.login-form {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+    .login-form h2 {
+        margin-bottom: 20px;
+        text-align: center;
+        font-size: 24px;
+    }
+
+.form-group label {
+    font-weight: bold;
+    color: #333;
 }
 
-body {
-  margin-bottom: 60px;
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    margin-bottom: 15px;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+    .form-group input:focus {
+        outline: none;
+        border-color: #007bff;
+    }
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+    padding: 12px 0;
+    border-radius: 5px;
+    border: none;
+    width: 100%;
+    cursor: pointer;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+.forgot-password {
+    text-align: center;
+    margin-top: 10px;
 }
+
+    .forgot-password a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+.alert {
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 5px;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+    .alert p {
+        margin: 0;
+    }
+
+.alert-danger,
+.validation-summary-errors {
+    background-color: #f8d7da;
+    border: 1px solid #f5c2c7;
+    color: #842029;
+    padding: .75rem 1rem;
+    border-radius: .375rem;
+}
+
+.alert-success {
+    background-color: #d1e7dd !important;
+    border-color: #badbcc !important;
+    color: #0f5132 !important;
+}
+
+
+
+.create-button {
+    background-color: green; 
+    padding:10px;
+    color: white;
+    border: none;
+    border-radius: 4px; 
+    cursor: pointer; 
+    transition: background-color 0.2s ease;
+}
+
+    .create-button:hover {
+        background-color: #0056b3; 
+    }
+
+.create-button-link {
+    color: inherit; 
+    text-decoration: none; 
+    display: block; 
+}
+
+    .create-button-link:hover {
+        color: inherit; 
+        text-decoration: none; 
+    }
+
+.password-toggle {
+    position: absolute;
+    right: .75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 0;
+    background: transparent;
+    color: #6c757d; 
+    padding: 0;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .password-toggle:hover {
+        color: #495057;
+    }
+
+    .password-toggle:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+.btn.w-auto {
+    width: auto !important;
+}
+
+.btn-header {
+    display: inline-flex !important;
+    width: auto !important;
+    align-items: center;
+    gap: .375rem;
+    white-space: nowrap;
+    padding-inline: .75rem;
+}
+
+.card .table th, .card .table td {
+    vertical-align: middle;
+}
+
+.btn-header {
+    --bs-btn-font-size: .95rem;
+}
+
+.password-toggle {
+    position: absolute;
+    right: .75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2rem;
+    height: 2rem;
+    border: 0;
+    background: transparent;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+    cursor: pointer;
+}
+
+    .password-toggle:hover {
+        color: #495057;
+    }
+
+    .password-toggle:focus {
+        outline: none;
+        box-shadow: none;
+    }

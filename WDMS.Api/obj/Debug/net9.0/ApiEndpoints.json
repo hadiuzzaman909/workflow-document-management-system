@@ -367,5 +367,37 @@
       }
     ],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WDMS.Api.Controllers.WorkflowController",
+    "Method": "ApproveTask",
+    "RelativePath": "api/Workflow/approve-task/{taskAssignmentId}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "taskAssignmentId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WDMS.Api.Controllers.WorkflowController",
+    "Method": "RejectTask",
+    "RelativePath": "api/Workflow/reject-task/{taskAssignmentId}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "taskAssignmentId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   }
 ]

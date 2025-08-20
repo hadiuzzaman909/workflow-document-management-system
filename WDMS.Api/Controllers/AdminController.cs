@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WDMS.Application.DTOs;
 using WDMS.Application.DTOs.Request;
-using WDMS.Infrastructure.Services;
+using WDMS.Applocation.Services;
 using WDMS.Infrastructure.Utils;
 
 namespace WDMS.Api.Controllers
@@ -41,6 +41,7 @@ namespace WDMS.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "Permission.ReadWrite")]
         public async Task<ActionResult<List<AdminResponse>>> GetAdmins()
         {
             try

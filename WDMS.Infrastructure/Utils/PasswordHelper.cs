@@ -5,30 +5,24 @@ namespace WDMS.Infrastructure.Utils
 {
     public static class PasswordHelper
     {
-        public static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        public static string CreatePasswordHash(string password)
         {
             if (string.IsNullOrWhiteSpace(password))
                 throw new ArgumentException("Password cannot be empty or whitespace.", nameof(password));
 
-            using var hmac = new HMACSHA512();
-            passwordSalt = hmac.Key;
-            passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+            using var sha512 = SHA512.Create();
+            var passwordHash = sha512.ComputeHash(Encoding.UTF8.GetBytes(password));
+            return Convert.ToBase64String(passwordHash);
         }
 
-        public static bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        public static bool VerifyPasswordHash(string password, string storedPasswordHash)
         {
-            if (string.IsNullOrWhiteSpace(password))
+            if (string.IsNullOrWhiteSpace(password) || string.IsNullOrEmpty(storedPasswordHash))
                 return false;
 
-            if (passwordHash.Length != 64)
-                return false;
+            var hashedPassword = CreatePasswordHash(password);
 
-            if (passwordSalt.Length != 128)
-                return false;
-
-            using var hmac = new HMACSHA512(passwordSalt);
-            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-            return computedHash.SequenceEqual(passwordHash);
+            return hashedPassword == storedPasswordHash; 
         }
     }
 }

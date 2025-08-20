@@ -20,7 +20,7 @@ namespace WDMS.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
 
-  
+
             modelBuilder.Entity<Admin>(entity =>
             {
                 entity.HasKey(e => e.AdminId);
@@ -129,31 +129,15 @@ namespace WDMS.Infrastructure.Data
                     .HasFilter("[IsDeleted] = 0");
             });
 
-            modelBuilder.Entity<Workflow>(entity =>
-            {
-                entity.HasKey(e => e.WorkflowId);
+            modelBuilder.Entity<Workflow>()
+                        .HasOne(w => w.CreatedByAdmin)
+                        .WithMany()
+                        .HasForeignKey(w => w.CreatedByAdminId)
+                        .IsRequired(false)
+                        .OnDelete(DeleteBehavior.Restrict);
 
-                entity.Property(e => e.Name)
-                    .IsRequired()
-                    .HasMaxLength(255);
-
-                entity.Property(e => e.CreatedAt)
-                    .IsRequired()
-                    .HasDefaultValueSql("GETUTCDATE()");
-
-                entity.Property(e => e.UpdatedAt)
-                    .IsRequired()
-                    .HasDefaultValueSql("GETUTCDATE()");
-
-                entity.Property(e => e.IsDeleted)
-                    .IsRequired()
-                    .HasDefaultValue(false);
-
-                entity.HasOne(e => e.CreatedByAdmin)  
-                    .WithMany() 
-                    .HasForeignKey(e => e.CreatedByAdminId)
-                    .OnDelete(DeleteBehavior.Restrict); 
-            });
+            modelBuilder.Entity<Workflow>().Property(w => w.Name).HasMaxLength(255);
+            modelBuilder.Entity<Workflow>().HasQueryFilter(w => !w.IsDeleted);
 
             modelBuilder.Entity<WorkflowAdmin>()
                 .HasKey(e => new { e.WorkflowId, e.AdminId });
@@ -189,27 +173,21 @@ namespace WDMS.Infrastructure.Data
                       .HasDefaultValue(false);
 
                 entity.HasOne(d => d.DocumentType)
-                      .WithMany(dt => dt.Documents)             
+                      .WithMany(dt => dt.Documents)
                       .HasForeignKey(d => d.DocumentTypeId)
                       .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(d => d.Workflow)
-                      .WithMany(w => w.Documents)               
+                      .WithMany(w => w.Documents)
                       .HasForeignKey(d => d.WorkflowId)
                       .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(d => d.CreatedByAdmin)
-                      .WithMany()                               
+                      .WithMany()
                       .HasForeignKey(d => d.CreatedByAdminId)
                       .OnDelete(DeleteBehavior.Restrict);
             });
-
-
-
         }
-
-
-
 
     }
 }

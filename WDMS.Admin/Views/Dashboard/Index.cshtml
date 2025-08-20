@@ -1,0 +1,102 @@
+﻿@model IEnumerable<WDMS.Domain.Entities.TaskAssignment>
+@using System.Security.Claims
+@{
+    ViewData["Title"] = "Dashboard";
+    bool CanWrite = User.IsInRole("ReadWrite") || User.HasClaim("access_level", "ReadWrite");
+    var hasItems = Model != null && Model.Any();
+}
+
+<div class="container mt-3">
+    <div class="page-header d-flex align-items-center mb-3">
+        <h2 class="mb-0">My Tasks</h2>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card shadow-sm rounded-3 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle mb-0 table-comfy">
+                <thead class="table-light">
+                    <tr>
+                        <th>Workflow</th>
+                        <th>Type</th>
+                        <th>Assigned</th>
+                        <th>Status</th>
+                        <th class="text-start" style="width:220px">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!hasItems)
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">No pending tasks.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var t in Model)
+                        {
+                            <tr>
+                                <td class="fw-medium">@t.Workflow?.Name</td>
+                                <td>@t.Workflow?.Type</td>
+                                <td>@t.AssignedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td>
+                                    @if (t.IsActive && t.Status == WDMS.Domain.Enums.TaskState.Pending)
+                                    {
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    }
+                                </td>
+                                <td class="text-start">
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if (CanWrite && t.IsActive && t.Status == WDMS.Domain.Enums.TaskState.Pending)
+                                        {
+                                            <form asp-action="Approve" method="post" class="m-0 d-inline-block">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@t.TaskAssignmentId" />
+                                                <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                            </form>
+                                            <form asp-action="Reject" method="post" class="m-0 d-inline-block"
+                                                  onsubmit="return confirm('Reject this task?');">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@t.TaskAssignmentId" />
+                                                <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn btn-sm btn-outline-secondary" disabled>Approve</button>
+                                            <button class="btn btn-sm btn-outline-secondary" disabled>Reject</button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    setTimeout(() => {
+      const el = document.querySelector('.alert.alert-success');
+      if (el) bootstrap.Alert.getOrCreateInstance(el).close();
+    }, 3000);
+</script>

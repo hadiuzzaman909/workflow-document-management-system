@@ -1,11 +1,10 @@
 ﻿using WDMS.Application.DTOs;
+using WDMS.Applocation.Services;
+using WDMS.Domain.Entities;
 using WDMS.Infrastructure.Repositories;
-using System.Security.Cryptography;
-using System.Text;
 using WDMS.Infrastructure.Utils;
 
-
-namespace WDMS.Infrastructure.Services
+namespace WDMS.Application.Services
 {
     public class AdminService : IAdminService
     {
@@ -53,6 +52,18 @@ namespace WDMS.Infrastructure.Services
             };
         }
 
+        public async Task<Admin> GetAdminByEmail(string email)
+        {
+            var admin = await _adminRepository.GetActiveByEmailAsync(email);
+
+            if (admin == null)
+            {
+                return null;
+            }
+
+            return admin;
+        }
+
         public async Task<AdminResponse?> GetAdminByEmailAsync(string email)
         {
             var admin = await _adminRepository.GetActiveByEmailAsync(email);
@@ -75,7 +86,7 @@ namespace WDMS.Infrastructure.Services
 
         public async Task<AdminResponse> CreateAdminAsync(AdminRequest adminRequest)
         {
-            // Check if admin with email already exists
+
             var emailExists = await _adminRepository.EmailExistsAsync(adminRequest.Email);
 
             if (emailExists)
@@ -86,7 +97,7 @@ namespace WDMS.Infrastructure.Services
             var admin = new Admin
             {
                 Email = adminRequest.Email,
-                PasswordHash = HashPassword(adminRequest.Password),
+                PasswordHash = PasswordHelper.CreatePasswordHash(adminRequest.Password), 
                 AccessLevel = adminRequest.AccessLevel,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
@@ -116,7 +127,7 @@ namespace WDMS.Infrastructure.Services
                 return false;
             }
 
-            // Check if another admin with the same email exists (excluding current admin)
+
             var emailExists = await _adminRepository.EmailExistsAsync(adminRequest.Email, adminRequest.AdminId);
 
             if (emailExists)
@@ -128,10 +139,10 @@ namespace WDMS.Infrastructure.Services
             admin.AccessLevel = adminRequest.AccessLevel;
             admin.UpdatedAt = DateTime.UtcNow;
 
-            // Update password only if provided
+
             if (!string.IsNullOrEmpty(adminRequest.Password))
             {
-                admin.PasswordHash = HashPassword(adminRequest.Password);
+                admin.PasswordHash = PasswordHelper.CreatePasswordHash(adminRequest.Password); 
             }
 
             await _adminRepository.UpdateAsync(admin);
@@ -152,32 +163,19 @@ namespace WDMS.Infrastructure.Services
                 return false;
             }
 
-            return VerifyPassword(password, admin.PasswordHash);
+            return PasswordHelper.VerifyPasswordHash(password, admin.PasswordHash); 
         }
 
         public async Task<string?> GenerateJwtTokenAsync(string email, string password)
         {
             var admin = await _adminRepository.GetActiveByEmailAsync(email);
 
-            if (admin == null || !VerifyPassword(password, admin.PasswordHash))
+            if (admin == null || !PasswordHelper.VerifyPasswordHash(password, admin.PasswordHash)) 
             {
                 return null;
             }
 
             return _jwtUtils.GenerateJwtToken(admin.Email, admin.AccessLevel.ToString(), admin.AdminId);
-        }
-
-        private static string HashPassword(string password)
-        {
-            using var sha256 = SHA256.Create();
-            var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-            return Convert.ToBase64String(hashedBytes);
-        }
-
-        private static bool VerifyPassword(string password, string hashedPassword)
-        {
-            var hashedInput = HashPassword(password);
-            return hashedInput == hashedPassword;
         }
     }
 }

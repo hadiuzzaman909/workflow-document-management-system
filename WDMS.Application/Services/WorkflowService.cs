@@ -1,20 +1,23 @@
 ﻿using WDMS.Application.Services.IServices;
 using WDMS.Domain.Entities;
 using WDMS.Domain.Enums;
+using WDMS.Infrastructure.Repositories;
 using WDMS.Infrastructure.Repositories.IRepositories;
 
 
-namespace WDMS.Infrastructure.Services
+namespace WDMS.Application.Services
 {
     public class WorkflowService : IWorkflowService
     {
-        private readonly IGenericRepository<Workflow> _workflowRepository;
+
         private readonly ITaskAssignmentRepository _taskAssignmentRepository;
         private readonly IDocumentRepository _documentRepository;
         private readonly IGenericRepository<Admin> _adminRepository;
+        private readonly IWorkflowRepository _workflowRepository;
 
-        public WorkflowService(IGenericRepository<Workflow> workflowRepository,
-                               ITaskAssignmentRepository taskAssignmentRepository,
+        public WorkflowService(
+            IWorkflowRepository workflowRepository,
+        ITaskAssignmentRepository taskAssignmentRepository,
                                IDocumentRepository documentRepository,
                                IGenericRepository<Admin> adminRepository)
         {
@@ -24,14 +27,20 @@ namespace WDMS.Infrastructure.Services
             _adminRepository = adminRepository;
         }
 
+
+        public async Task<Workflow> CreateWorkflowAsync(Workflow workflow)
+        {
+            await _workflowRepository.AddAsync(workflow);
+            return workflow; 
+        }
+
         public async Task AssignTasksToWorkflowAsync(int workflowId, List<int> adminIds)
         {
-            var workflow = await _workflowRepository.GetByIdAsync(workflowId);
-            if (workflow == null) throw new Exception("Workflow not found");
+            var workflow = await _workflowRepository.GetByIdAsync(workflowId)
+                          ?? throw new Exception("Workflow not found");
 
             if (workflow.Type == WorkflowType.Order)
             {
-
                 for (int i = 0; i < adminIds.Count; i++)
                 {
                     var task = new TaskAssignment
@@ -39,14 +48,15 @@ namespace WDMS.Infrastructure.Services
                         WorkflowId = workflowId,
                         AdminId = adminIds[i],
                         Status = TaskState.Pending,
+                        StepOrder = i,
+                        IsActive = (i == 0),               
                         AssignedAt = DateTime.UtcNow
                     };
                     await _taskAssignmentRepository.AddAsync(task);
                 }
             }
-            else if (workflow.Type == WorkflowType.Pool)
+            else
             {
-
                 foreach (var adminId in adminIds)
                 {
                     var task = new TaskAssignment
@@ -54,6 +64,8 @@ namespace WDMS.Infrastructure.Services
                         WorkflowId = workflowId,
                         AdminId = adminId,
                         Status = TaskState.Pending,
+                        StepOrder = 0,
+                        IsActive = true,                   
                         AssignedAt = DateTime.UtcNow
                     };
                     await _taskAssignmentRepository.AddAsync(task);
@@ -63,27 +75,63 @@ namespace WDMS.Infrastructure.Services
 
         public async Task ApproveTaskAsync(int taskAssignmentId)
         {
-            var taskAssignment = await _taskAssignmentRepository.GetByIdAsync(taskAssignmentId);
-            if (taskAssignment == null) throw new Exception("Task not found");
+            var task = await _taskAssignmentRepository.GetByIdAsync(taskAssignmentId)
+                       ?? throw new Exception("Task not found");
 
-            taskAssignment.Status = TaskState.Approved;
-            taskAssignment.ApprovedAt = DateTime.UtcNow;
+            task.Status = TaskState.Approved;
+            task.ApprovedAt = DateTime.UtcNow;
+            task.IsActive = false;
+            await _taskAssignmentRepository.UpdateAsync(task);
 
-            await UpdateDocumentStatus(taskAssignment.WorkflowId);
-            await _taskAssignmentRepository.UpdateAsync(taskAssignment);
+            var workflow = await _workflowRepository.GetByIdAsync(task.WorkflowId);
+            if (workflow?.Type == WorkflowType.Order)
+            {
+                var all = (await _taskAssignmentRepository.GetAllByWorkflowIdAsync(task.WorkflowId))
+                          .OrderBy(t => t.StepOrder).ToList();
+
+                var currentIndex = all.FindIndex(t => t.TaskAssignmentId == taskAssignmentId);
+                if (currentIndex >= 0 && currentIndex < all.Count - 1)
+                {
+                    var next = all[currentIndex + 1];
+                    if (next.Status == TaskState.Pending && !next.IsActive)
+                    {
+                        next.IsActive = true;
+                        next.AssignedAt = DateTime.UtcNow;
+                        await _taskAssignmentRepository.UpdateAsync(next);
+                    }
+                }
+            }
+
+            await UpdateDocumentStatus(task.WorkflowId);
         }
 
         public async Task RejectTaskAsync(int taskAssignmentId)
         {
-            var taskAssignment = await _taskAssignmentRepository.GetByIdAsync(taskAssignmentId);
-            if (taskAssignment == null) throw new Exception("Task not found");
+            var task = await _taskAssignmentRepository.GetByIdAsync(taskAssignmentId)
+                       ?? throw new Exception("Task not found");
 
-            taskAssignment.Status = TaskState.Rejected;
-            taskAssignment.RejectedAt = DateTime.UtcNow;
+            task.Status = TaskState.Rejected;
+            task.RejectedAt = DateTime.UtcNow;
+            task.IsActive = false;
+            await _taskAssignmentRepository.UpdateAsync(task);
 
-            await UpdateDocumentStatus(taskAssignment.WorkflowId);
-            await _taskAssignmentRepository.UpdateAsync(taskAssignment);
+            var workflow = await _workflowRepository.GetByIdAsync(task.WorkflowId);
+            if (workflow?.Type == WorkflowType.Order)
+            {
+                var rest = await _taskAssignmentRepository.GetAllByWorkflowIdAsync(task.WorkflowId);
+                foreach (var t in rest.Where(t => t.TaskAssignmentId != taskAssignmentId && t.Status == TaskState.Pending))
+                {
+                    if (t.IsActive)
+                    {
+                        t.IsActive = false;
+                        await _taskAssignmentRepository.UpdateAsync(t);
+                    }
+                }
+            }
+
+            await UpdateDocumentStatus(task.WorkflowId);
         }
+
 
         private async Task UpdateDocumentStatus(int workflowId)
         {
@@ -128,11 +176,6 @@ namespace WDMS.Infrastructure.Services
         public async Task<Workflow> GetWorkflowByIdAsync(int id)
         {
             return await _workflowRepository.GetByIdAsync(id);
-        }
-
-        public async Task CreateWorkflowAsync(Workflow workflow)
-        {
-            await _workflowRepository.AddAsync(workflow);
         }
 
         public async Task UpdateWorkflowAsync(Workflow workflow)

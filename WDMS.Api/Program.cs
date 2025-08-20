@@ -1,14 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using WDMS.Api.Extensions;
-using WDMS.Application.Mappings;
 using WDMS.Application.Services;
 using WDMS.Application.Services.IServices;
+using WDMS.Applocation.Services;
 using WDMS.Domain.Enums;
 using WDMS.Infrastructure.Data;
 using WDMS.Infrastructure.Repositories;
 using WDMS.Infrastructure.Repositories.IRepositories;
-using WDMS.Infrastructure.Services;
 using WDMS.Infrastructure.Utils;
 
 namespace WDMS.Api
@@ -48,14 +47,13 @@ namespace WDMS.Api
             builder.Services.AddScoped<IAuthorizationHandler, PermissionHandler>();
             builder.Services.AddScoped<IFileStorage, LocalFileStorage>();
             builder.Services.AddScoped<IDocumentService, DocumentService>();
+            builder.Services.AddScoped<IWorkflowRepository, WorkflowRepository>();
 
 
-            // Add Authorization Policies (Role-Based Access Control)
             builder.Services.AddAuthorization(options =>
             {
                 options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
 
-                // Permission-based policies
                 options.AddPolicy("Permission.ReadOnly", policy =>
                     policy.Requirements.Add(new PermissionRequirement(AccessLevel.ReadOnly)));
 
@@ -69,16 +67,6 @@ namespace WDMS.Api
             builder.Services.ConfigureSwagger();
 
             var app = builder.Build();
-
-
-            // Data seeding
-            //using (var scope = app.Services.CreateScope())
-            //{
-            //    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            //    context.Database.Migrate();
-
-            //    DbSeeder.Seed(context);
-            //}
 
             // Middleware Pipeline
             app.UseCorsPolicies(builder.Configuration);

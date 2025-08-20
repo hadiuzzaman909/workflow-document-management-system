@@ -1,0 +1,248 @@
+﻿@* @using System.Text.Encodings.Web;
+@using System.Security.Claims;
+
+@model IEnumerable<WDMS.Application.DTOs.Response.DocumentResponse>
+@{
+    bool CanWrite = User.IsInRole("ReadWrite") || User.HasClaim("access_level", "ReadWrite");
+}
+@{
+    ViewData["Title"] = "Documents";
+    var hasItems = Model != null && Model.Any();
+    string FriendlySize(long bytes)
+        => bytes >= 1024 * 1024 ? $"{bytes / (1024.0 * 1024.0):0.##} MB"
+         : bytes >= 1024 ? $"{bytes / 1024.0:0.#} KB"
+         : $"{bytes} B";
+}
+
+<div class="container mt-3">
+    <div class="page-header d-flex align-items-center mb-3">
+        <h2 class="mb-0">Documents</h2>
+
+    @if (CanWrite)
+    {
+        <a asp-action="Create"
+           class="btn btn-primary btn-sm btn-header ms-auto">
+            Upload Document
+        </a>
+    }
+
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="card shadow-sm rounded-3 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle mb-0 table-comfy">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:26%">Name</th>
+                        <th>Type</th>
+                        <th>Workflow</th>
+                        <th>Size</th>
+                        <th>Created</th>
+                        <th class="text-start" style="width:220px">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (!hasItems)
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">No documents found.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var d in Model)
+                    {
+                        <tr>
+                            <td class="fw-medium">
+                                @d.Name
+                                @if (!string.IsNullOrWhiteSpace(d.ContentType))
+                                {
+                                    <div class="text-muted small">@d.ContentType</div>
+                                }
+                            </td>
+                            <td>@d.DocumentTypeName</td>
+                            <td>@d.WorkflowName</td>
+                            <td>@FriendlySize(d.FileSizeBytes)</td>
+                            <td>@d.CreatedAt.ToString("yyyy-MM-dd HH:mm")<div class="text-muted small">@d.CreatedByEmail</div></td>
+                            <td class="text-start">
+                                <div class="d-flex align-items-center gap-2">
+                                    @if (!string.IsNullOrWhiteSpace(d.FileUrl))
+                                    {
+                                        <a href="@d.FileUrl" target="_blank" rel="noopener" class="btn btn-sm btn-outline-secondary">
+                                            Open
+                                        </a>
+                                    }
+
+                                    <a asp-action="Download"
+                                       asp-route-id="@d.DocumentId"
+                                       class="btn btn-sm btn-secondary">
+                                        Download
+                                    </a>
+
+                                        <form asp-action="Delete"
+                                              asp-route-id="@d.DocumentId"
+                                              method="post"
+                                              class="m-0 d-inline-block"
+                                              onsubmit="return confirm('Delete &quot;@JavaScriptEncoder.Default.Encode(d.Name)&quot; ?');">
+                                            @Html.AntiForgeryToken()
+                                            @if (CanWrite)
+                                            {
+                                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                            }
+                                            else
+                                            {
+                                               
+                                                <button class="btn btn-sm btn-danger" disabled title="Read-only access">Delete</button>
+                                            }
+                                        </form>
+
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    setTimeout(() => {
+      const el = document.querySelector('.alert.alert-success');
+      if (el) bootstrap.Alert.getOrCreateInstance(el).close();
+    }, 3000);
+</script> *@
+
+
+@using System.Text.Encodings.Web
+@using WDMS.Domain.Enums
+@{
+    bool CanWrite = User.IsInRole("ReadWrite") || User.HasClaim("access_level", "ReadWrite");
+}
+@model IEnumerable<WDMS.Application.DTOs.Response.DocumentResponse>
+
+@{
+    string FriendlySize(long bytes)
+        => bytes >= 1024 * 1024 ? $"{bytes / (1024.0 * 1024.0):0.##} MB"
+         : bytes >= 1024 ? $"{bytes / 1024.0:0.#} KB"
+         : $"{bytes} B";
+}
+
+<div class="container mt-3">
+    <div class="page-header d-flex align-items-center mb-3">
+        <h2 class="mb-0">Documents</h2>
+        @if (CanWrite)
+        {
+            <a asp-action="Create"
+               class="btn btn-primary btn-sm btn-header ms-auto">
+                Upload Document
+            </a>
+        }
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card shadow-sm rounded-3 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle mb-0 table-comfy">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:26%">Name</th>
+                        <th>Type</th>
+                        <th>Workflow</th>
+                        <th>Status</th>   @* 👈 NEW *@
+                        <th>Size</th>
+                        <th>Created</th>
+                        <th class="text-start" style="width:220px">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var d in Model)
+                {
+                    <tr>
+                        <td class="fw-medium">
+                            @d.Name
+                            @if (!string.IsNullOrWhiteSpace(d.ContentType))
+                            {
+                                <div class="text-muted small">@d.ContentType</div>
+                            }
+                        </td>
+                        <td>@d.DocumentTypeName</td>
+                        <td>@d.WorkflowName</td>
+                        <td>
+                            @switch (d.State)
+                            {
+                                case DocumentState.Approved:
+                                    @:<span class="badge bg-success">Approved</span>
+                                    break;
+                                case DocumentState.Rejected:
+                                    @:<span class="badge bg-danger">Rejected</span>
+                                    break;
+                                default:
+                                    @:<span class="badge bg-warning text-dark">Pending</span>
+                                    break;
+                            }
+                        </td>
+                        <td>@FriendlySize(d.FileSizeBytes)</td>
+                        <td>
+                            @d.CreatedAt.ToString("yyyy-MM-dd HH:mm")
+                            <div class="text-muted small">@d.CreatedByEmail</div>
+                        </td>
+                        <td class="text-start">
+                            <div class="d-flex align-items-center gap-2">
+                                @if (!string.IsNullOrWhiteSpace(d.FileUrl))
+                                {
+                                    <a href="@d.FileUrl" target="_blank" rel="noopener" class="btn btn-sm btn-outline-secondary">Open</a>
+                                }
+                                <a asp-action="Download" asp-route-id="@d.DocumentId" class="btn btn-sm btn-secondary">Download</a>
+                                    <form asp-action="Delete"
+                                          asp-route-id="@d.DocumentId"
+                                          method="post"
+                                          class="m-0 d-inline-block"
+                                          onsubmit="return confirm('Delete &quot;@JavaScriptEncoder.Default.Encode(d.Name)&quot; ?');">
+                                        @Html.AntiForgeryToken()
+                                        @if (CanWrite)
+                                        {
+                                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                        }
+                                        else
+                                        {
+
+                                            <button class="btn btn-sm btn-danger" disabled title="Read-only access">Delete</button>
+                                        }
+                                    </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    setTimeout(() => {
+      const el = document.querySelector('.alert.alert-success');
+      if (el) bootstrap.Alert.getOrCreateInstance(el).close();
+    }, 3000);
+</script>

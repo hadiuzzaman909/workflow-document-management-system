@@ -5,7 +5,7 @@ using WDMS.Application.Services.IServices;
 using WDMS.Domain.Entities;
 using WDMS.Infrastructure.Repositories.IRepositories;
 
-namespace WDMS.Infrastructure.Services
+namespace WDMS.Application.Services
     {
         public class DocumentTypeService : IDocumentTypeService
         {

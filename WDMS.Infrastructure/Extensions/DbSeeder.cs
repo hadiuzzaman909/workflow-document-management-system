@@ -1,7 +1,7 @@
-﻿using WDMS.Domain.Enums;
-using System.Security.Cryptography;
-using System.Text;
+﻿using WDMS.Domain.Entities;
+using WDMS.Domain.Enums;
 using WDMS.Infrastructure.Data;
+using WDMS.Infrastructure.Utils;
 
 namespace WDMS.Infrastructure.Extensions
 {
@@ -14,7 +14,7 @@ namespace WDMS.Infrastructure.Extensions
                 var readWriteAdmin = new Admin
                 {
                     Email = "admin@wdms.com",
-                    PasswordHash = HashPassword("Admin@123"),
+                    PasswordHash = PasswordHelper.CreatePasswordHash("Admin@123"), 
                     AccessLevel = AccessLevel.ReadWrite,
                     IsActive = true,
                     IsDeleted = false,
@@ -22,11 +22,10 @@ namespace WDMS.Infrastructure.Extensions
                     UpdatedAt = DateTime.UtcNow
                 };
 
-
                 var readOnlyAdmin = new Admin
                 {
                     Email = "viewer@wdms.com",
-                    PasswordHash = HashPassword("Viewer@123"),
+                    PasswordHash = PasswordHelper.CreatePasswordHash("Viewer@123"), 
                     AccessLevel = AccessLevel.ReadOnly,
                     IsActive = true,
                     IsDeleted = false,
@@ -36,15 +35,8 @@ namespace WDMS.Infrastructure.Extensions
 
                 context.Admins.AddRange(readWriteAdmin, readOnlyAdmin);
                 context.SaveChanges();
-
             }
         }
 
-        private static string HashPassword(string password)
-        {
-            using var sha256 = SHA256.Create();
-            var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-            return Convert.ToBase64String(hashedBytes);
-        }
     }
 }

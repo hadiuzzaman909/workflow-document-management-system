@@ -22,7 +22,7 @@ namespace WDMS.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Admin", b =>
+            modelBuilder.Entity("WDMS.Domain.Entities.Admin", b =>
                 {
                     b.Property<int>("AdminId")
                         .ValueGeneratedOnAdd()
@@ -77,6 +77,79 @@ namespace WDMS.Infrastructure.Migrations
                     b.ToTable("Admins");
                 });
 
+            modelBuilder.Entity("WDMS.Domain.Entities.Document", b =>
+                {
+                    b.Property<int>("DocumentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DocumentId"));
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(127)
+                        .HasColumnType("nvarchar(127)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<int>("CreatedByAdminId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DocumentTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("DocumentUid")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
+                    b.Property<long>("FileSizeBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("OriginalFileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("WorkflowId")
+                        .HasColumnType("int");
+
+                    b.HasKey("DocumentId");
+
+                    b.HasIndex("CreatedByAdminId");
+
+                    b.HasIndex("DocumentTypeId");
+
+                    b.HasIndex("DocumentUid")
+                        .IsUnique();
+
+                    b.HasIndex("WorkflowId");
+
+                    b.ToTable("Documents");
+                });
+
             modelBuilder.Entity("WDMS.Domain.Entities.DocumentType", b =>
                 {
                     b.Property<int>("DocumentTypeId")
@@ -119,6 +192,82 @@ namespace WDMS.Infrastructure.Migrations
                     b.ToTable("DocumentTypes");
                 });
 
+            modelBuilder.Entity("WDMS.Domain.Entities.TaskAssignment", b =>
+                {
+                    b.Property<int>("TaskAssignmentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TaskAssignmentId"));
+
+                    b.Property<int>("AdminId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("AssignedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("RejectedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StepOrder")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WorkflowId")
+                        .HasColumnType("int");
+
+                    b.HasKey("TaskAssignmentId");
+
+                    b.HasIndex("AdminId");
+
+                    b.HasIndex("WorkflowId");
+
+                    b.ToTable("TaskAssignments");
+                });
+
+            modelBuilder.Entity("WDMS.Domain.Entities.Workflow", b =>
+                {
+                    b.Property<int>("WorkflowId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WorkflowId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedByAdminId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("WorkflowId");
+
+                    b.HasIndex("CreatedByAdminId");
+
+                    b.ToTable("Workflows");
+                });
+
             modelBuilder.Entity("WDMS.Domain.Entities.WorkflowAdmin", b =>
                 {
                     b.Property<int>("WorkflowId")
@@ -134,56 +283,71 @@ namespace WDMS.Infrastructure.Migrations
                     b.ToTable("WorkflowAdmins");
                 });
 
-            modelBuilder.Entity("Workflow", b =>
+            modelBuilder.Entity("WDMS.Domain.Entities.Document", b =>
                 {
-                    b.Property<int>("WorkflowId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.HasOne("WDMS.Domain.Entities.Admin", "CreatedByAdmin")
+                        .WithMany()
+                        .HasForeignKey("CreatedByAdminId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WorkflowId"));
+                    b.HasOne("WDMS.Domain.Entities.DocumentType", "DocumentType")
+                        .WithMany("Documents")
+                        .HasForeignKey("DocumentTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                    b.HasOne("WDMS.Domain.Entities.Workflow", "Workflow")
+                        .WithMany("Documents")
+                        .HasForeignKey("WorkflowId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.Property<int>("CreatedByAdminId")
-                        .HasColumnType("int");
+                    b.Navigation("CreatedByAdmin");
 
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                    b.Navigation("DocumentType");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                    b.Navigation("Workflow");
+                });
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+            modelBuilder.Entity("WDMS.Domain.Entities.TaskAssignment", b =>
+                {
+                    b.HasOne("WDMS.Domain.Entities.Admin", "Admin")
+                        .WithMany()
+                        .HasForeignKey("AdminId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                    b.HasOne("WDMS.Domain.Entities.Workflow", "Workflow")
+                        .WithMany()
+                        .HasForeignKey("WorkflowId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasKey("WorkflowId");
+                    b.Navigation("Admin");
 
-                    b.HasIndex("CreatedByAdminId");
+                    b.Navigation("Workflow");
+                });
 
-                    b.ToTable("Workflows");
+            modelBuilder.Entity("WDMS.Domain.Entities.Workflow", b =>
+                {
+                    b.HasOne("WDMS.Domain.Entities.Admin", "CreatedByAdmin")
+                        .WithMany()
+                        .HasForeignKey("CreatedByAdminId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByAdmin");
                 });
 
             modelBuilder.Entity("WDMS.Domain.Entities.WorkflowAdmin", b =>
                 {
-                    b.HasOne("Admin", "Admin")
+                    b.HasOne("WDMS.Domain.Entities.Admin", "Admin")
                         .WithMany("WorkflowAdmins")
                         .HasForeignKey("AdminId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Workflow", "Workflow")
+                    b.HasOne("WDMS.Domain.Entities.Workflow", "Workflow")
                         .WithMany("WorkflowAdmins")
                         .HasForeignKey("WorkflowId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -194,24 +358,20 @@ namespace WDMS.Infrastructure.Migrations
                     b.Navigation("Workflow");
                 });
 
-            modelBuilder.Entity("Workflow", b =>
-                {
-                    b.HasOne("Admin", "CreatedByAdmin")
-                        .WithMany()
-                        .HasForeignKey("CreatedByAdminId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CreatedByAdmin");
-                });
-
-            modelBuilder.Entity("Admin", b =>
+            modelBuilder.Entity("WDMS.Domain.Entities.Admin", b =>
                 {
                     b.Navigation("WorkflowAdmins");
                 });
 
-            modelBuilder.Entity("Workflow", b =>
+            modelBuilder.Entity("WDMS.Domain.Entities.DocumentType", b =>
                 {
+                    b.Navigation("Documents");
+                });
+
+            modelBuilder.Entity("WDMS.Domain.Entities.Workflow", b =>
+                {
+                    b.Navigation("Documents");
+
                     b.Navigation("WorkflowAdmins");
                 });
 #pragma warning restore 612, 618

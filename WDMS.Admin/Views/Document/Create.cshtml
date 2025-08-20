@@ -1,0 +1,65 @@
+﻿@model WDMS.Admin.Models.DocumentCreateViewModel
+@{
+    ViewData["Title"] = "Upload Document";
+}
+
+<div class="container mt-3">
+    <div class="page-header d-flex align-items-center mb-3">
+        <h2 class="mb-0">Upload Document</h2>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm ms-auto">Back to Documents</a>
+    </div>
+
+    <div class="card shadow-sm rounded-3">
+        <div class="card-body">
+            <form asp-action="Create" method="post" enctype="multipart/form-data" novalidate>
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3" role="alert"></div>
+
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <label asp-for="DocumentTypeId" class="form-label">Document Type</label>
+                        <select asp-for="DocumentTypeId" class="form-select" asp-items="Model.DocumentTypes">
+                            <option value="">-- Select Document Type --</option>
+                        </select>
+                        <span asp-validation-for="DocumentTypeId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label asp-for="WorkflowId" class="form-label">Workflow</label>
+                        <select asp-for="WorkflowId" class="form-select" asp-items="Model.Workflows">
+                            <option value="">-- Select Workflow --</option>
+                        </select>
+                        <span asp-validation-for="WorkflowId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="Name" class="form-label">Display Name (optional)</label>
+                        <input asp-for="Name" class="form-control" placeholder="If empty, original file name will be used" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="File" class="form-label">File</label>
+                        <input asp-for="File"
+                               class="form-control"
+                               type="file"
+                               accept=".pdf,.docx,.xlsx,.png,.jpg,.jpeg,.gif" />
+                        <div class="form-text">
+                            Allowed: PDF, DOCX, XLSX, PNG, JPG, GIF. Max 100 MB.
+                        </div>
+                        <span asp-validation-for="File" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

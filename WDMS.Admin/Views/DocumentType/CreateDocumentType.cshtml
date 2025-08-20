@@ -1,0 +1,37 @@
+﻿@model WDMS.Domain.Entities.DocumentType
+@{
+    ViewData["Title"] = "Create Document Type";
+}
+
+<div class="container mt-3">
+    <div class="page-header d-flex align-items-center mb-3">
+        <h2 class="mb-0">Create Document Type</h2>
+        <a asp-action="List" class="btn btn-outline-secondary btn-sm ms-auto">Back to Document Types</a>
+    </div>
+
+    <div class="card shadow-sm rounded-3">
+        <div class="card-body">
+            <form asp-action="CreateDocumentType" method="post" novalidate>
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3" role="alert"></div>
+
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label asp-for="Name" class="form-label">Name</label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

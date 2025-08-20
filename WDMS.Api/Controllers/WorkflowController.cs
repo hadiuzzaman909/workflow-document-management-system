@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WDMS.Application.Services.IServices;
+using WDMS.Domain.Entities;
 
 namespace WDMS.Api.Controllers
 {
@@ -52,13 +53,11 @@ namespace WDMS.Api.Controllers
             return NoContent();
         }
 
-        // Approve Task Endpoint
         [HttpPost("approve-task/{taskAssignmentId}")]
         public async Task<ActionResult> ApproveTask(int taskAssignmentId)
         {
             try
             {
-                // Call service to approve the task
                 await _workflowService.ApproveTaskAsync(taskAssignmentId);
                 return Ok(new { message = "Task approved successfully." });
             }
@@ -68,13 +67,11 @@ namespace WDMS.Api.Controllers
             }
         }
 
-        // Reject Task Endpoint
         [HttpPost("reject-task/{taskAssignmentId}")]
         public async Task<ActionResult> RejectTask(int taskAssignmentId)
         {
             try
             {
-                // Call service to reject the task
                 await _workflowService.RejectTaskAsync(taskAssignmentId);
                 return Ok(new { message = "Task rejected successfully." });
             }

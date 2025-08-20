@@ -21,7 +21,6 @@ namespace WDMS.Domain.Entities
         public int WorkflowId { get; set; }
         public Workflow Workflow { get; set; } = null!;
 
-        // File info
         [Required, MaxLength(1024)]
         public string FilePath { get; set; } = string.Empty;         
         [MaxLength(255)]
@@ -30,7 +29,6 @@ namespace WDMS.Domain.Entities
         public string ContentType { get; set; } = string.Empty;
         public long FileSizeBytes { get; set; }
 
-        // Audit
         [Required]
         public int CreatedByAdminId { get; set; }
         public Admin CreatedByAdmin { get; set; } = null!;

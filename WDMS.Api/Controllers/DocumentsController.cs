@@ -1,95 +1,134 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using WDMS.Application.DTOs.Request;
 using WDMS.Application.DTOs.Response;
-using WDMS.Application.Services.IServices;
-using WDMS.Infrastructure.Services;
+using WDMS.Application.Services;
 
 namespace WDMS.Api.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class DocumentController : ControllerBase
     {
         private readonly IDocumentService _documentService;
-        private readonly IFileStorage _fileStorage;
 
-        public DocumentController(IDocumentService documentService, IFileStorage fileStorage)
+        public DocumentController(IDocumentService documentService)
         {
             _documentService = documentService;
-            _fileStorage = fileStorage;
         }
 
+
         [HttpPost("upload")]
-        public async Task<ActionResult<DocumentResponse>> UploadDocument([FromForm] DocumentRequest documentRequest, IFormFile file)
+        [RequestFormLimits(MultipartBodyLengthLimit = 100 * 1024 * 1024)] 
+        [RequestSizeLimit(100 * 1024 * 1024)]
+        public async Task<ActionResult<DocumentResponse>> UploadDocument(
+            [FromForm] DocumentCreateRequest documentRequest,
+            CancellationToken ct)
         {
             try
             {
-                var filePath = await _fileStorage.SaveAsync(file, "documents");
+                var createdByAdminId = GetCurrentAdminId();
+                var created = await _documentService.CreateDocumentAsync(documentRequest, createdByAdminId, ct);
 
-                documentRequest.FilePath = filePath;
-
-                var document = await _documentService.CreateDocumentAsync(documentRequest);
-
-                return new ActionResult<DocumentResponse>(document);
+                return CreatedAtAction(nameof(GetDocumentById),
+                    new { id = created.DocumentId }, created);
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while uploading the document.", error = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = "An error occurred while uploading the document.",
+                    error = ex.Message
+                });
             }
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<DocumentResponse>> GetDocumentById(int id)
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<DocumentResponse>> GetDocumentById(int id, CancellationToken ct)
         {
             try
             {
-                var document = await _documentService.GetDocumentByIdAsync(id);
-
+                var document = await _documentService.GetDocumentByIdAsync(id, ct);
                 if (document == null)
-                {
                     return NotFound(new { message = $"Document with ID {id} not found." });
-                }
 
                 return Ok(document);
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving the document.", error = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = "An error occurred while retrieving the document.",
+                    error = ex.Message
+                });
+            }
+        }
+
+        [HttpGet("{id:int}/file")]
+        public async Task<IActionResult> Download(int id, CancellationToken ct)
+        {
+            try
+            {
+                var tuple = await _documentService.OpenAsync(id, ct);
+                if (tuple == null) return NotFound(new { message = "File not found." });
+
+                var (stream, contentType, fileName) = tuple.Value;
+                return File(stream, contentType, fileName);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = "An error occurred while downloading the file.",
+                    error = ex.Message
+                });
             }
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<DocumentResponse>>> GetAllDocuments()
+        public async Task<ActionResult<List<DocumentResponse>>> GetAllDocuments(CancellationToken ct)
         {
             try
             {
-                var documents = await _documentService.GetAllDocumentsAsync();
-
-                if (documents == null || documents.Count == 0)
-                {
-                    return NotFound(new { message = "No documents found." });
-                }
-
+                var documents = await _documentService.GetAllDocumentsAsync(ct);
                 return Ok(documents);
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving documents.", error = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = "An error occurred while retrieving documents.",
+                    error = ex.Message
+                });
             }
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteDocument(int id)
+
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> DeleteDocument(int id, CancellationToken ct)
         {
             try
             {
-                await _documentService.DeleteDocumentAsync(id);
+                var ok = await _documentService.DeleteDocumentAsync(id, ct);
+                if (!ok) return NotFound(new { message = $"Document with ID {id} not found." });
                 return NoContent();
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while deleting the document.", error = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = "An error occurred while deleting the document.",
+                    error = ex.Message
+                });
             }
+        }
+
+        private int GetCurrentAdminId()
+        {
+
+            var idValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(idValue, out var id)) return id;
+            throw new UnauthorizedAccessException("Invalid or missing admin id in token.");
         }
     }
 }

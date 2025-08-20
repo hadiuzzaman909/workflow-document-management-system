@@ -14,7 +14,7 @@ namespace WDMS.Api.Extensions
                 {
                     Title = "WDMS.API",
                     Version = "v1",
-                    Description = "WDMS"
+                    Description = "Workflow & Document Management System"
                 });
 
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

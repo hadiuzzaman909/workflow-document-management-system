@@ -1,0 +1,96 @@
+﻿@model WDMS.Admin.Models.CreateWorkflowViewModel
+@using WDMS.Domain.Enums
+@{
+    ViewData["Title"] = "Create Workflow";
+}
+
+<div class="container mt-3">
+    <div class="page-header d-flex align-items-center mb-3">
+        <h2 class="mb-0">Create Workflow</h2>
+        <a asp-action="Workflows" class="btn btn-outline-secondary btn-sm ms-auto">Back to Workflows</a>
+    </div>
+
+    <div class="card shadow-sm rounded-3">
+        <div class="card-body">
+            <form asp-action="CreateWorkflow" method="post" class="needs-validation" novalidate>
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3" role="alert"></div>
+                @if (ViewBag.ValidationErrors != null)
+                {
+                    <ul class="text-danger mb-3">
+                        @foreach (var err in (IEnumerable<string>)ViewBag.ValidationErrors)
+                        {
+                            <li>@err</li>
+                        }
+                    </ul>
+                }
+
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label asp-for="Workflow.Name" class="form-label">Name</label>
+                        <input asp-for="Workflow.Name" class="form-control" />
+                        <span asp-validation-for="Workflow.Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="Workflow.Type" class="form-label">Type</label>
+                        <select asp-for="Workflow.Type" class="form-select" asp-items="Html.GetEnumSelectList<WorkflowType>()">
+                            <option value="">-- Select Type --</option>
+                        </select>
+                        <span asp-validation-for="Workflow.Type" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Assign Admins (optional)</label>
+
+                        @if (Model.Admins == null || !Model.Admins.Any())
+                        {
+                            <div class="form-text">No admins available to assign.</div>
+                        }
+                        else
+                        {
+                            <div class="border rounded p-3" style="max-height:260px; overflow:auto">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" id="checkAllAdmins" />
+                                    <label class="form-check-label fw-semibold" for="checkAllAdmins">Select/Deselect All</label>
+                                </div>
+
+                                @foreach (var a in Model.Admins)
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input admin-checkbox"
+                                               type="checkbox"
+                                               name="SelectedAdminIds"
+                                               id="admin_@a.Id"
+                                               value="@a.Id" />
+                                        <label class="form-check-label" for="admin_@a.Id">@a.Label</label>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const checkAll = document.getElementById('checkAllAdmins');
+            if (checkAll) {
+                checkAll.addEventListener('change', function () {
+                    document.querySelectorAll('.admin-checkbox')
+                        .forEach(cb => cb.checked = checkAll.checked);
+                });
+            }
+        })();
+    </script>
+}

@@ -1,0 +1,89 @@
+﻿@model WDMS.Application.DTOs.Request.LoginRequest
+
+@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Login";
+}
+
+<div class="login-container">
+    <form class="login-form" method="post">
+        @Html.AntiForgeryToken()
+
+        <h2>Login</h2>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <p>@error.ErrorMessage</p>
+                }
+            </div>
+        }
+
+        <div class="form-group mb-3">
+            <label for="Email">Email Address</label>
+            <input type="email" class="form-control" id="Email" name="Email" value="@Model.Email" required />
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="Password">Password</label>
+
+            <div class="position-relative">
+             
+                <input type="password" class="form-control pe-5" id="Password" name="Password" required />
+
+                
+                <button type="button"
+                        class="password-toggle"
+                        id="togglePassword"
+                        aria-label="Show password"
+                        aria-pressed="false">
+            
+                    <span class="pw-icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-slash-fill" viewBox="0 0 16 16">
+                            <path d="m10.79 12.912-1.614-1.615a3.5 3.5 0 0 1-4.474-4.474l-2.06-2.06C.938 6.278 0 8 0 8s3 5.5 8 5.5a7 7 0 0 0 2.79-.588M5.21 3.088A7 7 0 0 1 8 2.5c5 0 8 5.5 8 5.5s-.939 1.721-2.641 3.238l-2.062-2.062a3.5 3.5 0 0 0-4.474-4.474z" />
+                            <path d="M5.525 7.646a2.5 2.5 0 0 0 2.829 2.829zm4.95.708-2.829-2.83a2.5 2.5 0 0 1 2.829 2.829zm3.171 6-12-12 .708-.708 12 12z" />
+                        </svg>
+                    </span>
+                    
+                    <span class="pw-icon d-none" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                            <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0" />
+                            <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7" />
+                        </svg>
+                    </span>
+                </button>
+            </div>
+        </div>
+
+
+        <button type="submit" class="btn btn-primary">Login</button>
+
+        <div class="forgot-password mt-2">
+            <a href="#">Forgot Password?</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        (function(){
+          const input = document.getElementById('Password');
+          const btn = document.getElementById('togglePassword');
+          if(!input || !btn) return;
+
+          const [eye, eyeSlash] = btn.querySelectorAll('.pw-icon');
+
+          btn.addEventListener('click', function(){
+            const showing = input.type === 'text';
+            input.type = showing ? 'password' : 'text';
+            eye.classList.toggle('d-none', !showing);      
+            eyeSlash.classList.toggle('d-none', showing); 
+            this.setAttribute('aria-pressed', (!showing).toString());
+            this.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+          });
+        })();
+    </script>
+}
+

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WDMS.Domain.Entities;
 using WDMS.Infrastructure.Data;
 
 namespace WDMS.Infrastructure.Repositories
